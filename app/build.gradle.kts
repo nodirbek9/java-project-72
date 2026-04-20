@@ -39,12 +39,17 @@ checkstyle {
 }
 
 dependencies {
+    // Databases
     implementation("com.h2database:h2:2.3.232")
     implementation("com.zaxxer:HikariCP:6.3.0")
+    implementation("org.postgresql:postgresql:42.1.4")
+    //Jackson
     implementation("com.fasterxml.jackson.core:jackson-databind:2.18.3")
     implementation("org.apache.commons:commons-text:1.13.1")
     implementation("gg.jte:jte:3.2.0")
-    implementation("org.slf4j:slf4j-simple:2.0.17")
+    implementation("org.projectlombok:lombok:0.11.0")
+    implementation("org.slf4j:slf4j-api:2.0.9")
+    implementation("ch.qos.logback:logback-classic:1.4.11")
     implementation("io.javalin:javalin:6.6.0")
     implementation("io.javalin:javalin-bundle:6.6.0")
     implementation("io.javalin:javalin-rendering:6.6.0")
