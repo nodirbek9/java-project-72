@@ -1,5 +1,9 @@
 package hexlet.code;
 
+import hexlet.code.dto.UrlPage;
+import hexlet.code.dto.UrlsPage;
+import hexlet.code.model.Url;
+import hexlet.code.repository.UrlRepository;
 import io.javalin.Javalin;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
@@ -7,8 +11,15 @@ import com.zaxxer.hikari.HikariDataSource;
 import javax.sql.DataSource;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
+import java.net.URI;
 import java.sql.SQLException;
+import java.util.Collections;
+import java.util.HashMap;
 import java.util.stream.Collectors;
+import gg.jte.ContentType;
+import gg.jte.TemplateEngine;
+import gg.jte.resolve.ResourceCodeResolver;
+import io.javalin.rendering.template.JavalinJte;
 
 public class App {
     public static void main(String[] args) {
@@ -22,14 +33,94 @@ public class App {
         try {
             runMigrations(dataSource);
         } catch (SQLException e) {
-            throw new RuntimeException(e);
+            throw new RuntimeException("Failed to run migrations", e);
         }
+        var urlRepository = new UrlRepository(dataSource);
 
         var app = Javalin.create(config -> {
             config.bundledPlugins.enableDevLogging();
+            config.fileRenderer(new JavalinJte(createTemplateEngine()));
         });
 
-        app.get("/", ctx -> ctx.result("Welcome to Hexlet!"));
+        app.get("/", ctx -> {
+            ctx.render("index.jte", Collections.singletonMap("ctx", ctx));
+        });
+
+        app.post("/urls", ctx -> {
+            String inputUrl = ctx.formParam("url");
+            System.out.println("Received URL: " + inputUrl);  // ← LOG
+
+            try {
+                // URL ni parse qilish
+                var uri = new URI(inputUrl);
+                var url = uri.toURL();
+
+                // Faqat protocol + host + port
+                String normalizedUrl = url.getProtocol() + "://" + url.getHost();
+                if (url.getPort() != -1) {
+                    normalizedUrl += ":" + url.getPort();
+                }
+                System.out.println("Normalized URL: " + normalizedUrl);  // ← LOG
+
+                // Mavjudligini tekshirish
+                var existingUrl = urlRepository.findByName(normalizedUrl);
+
+                if (existingUrl.isPresent()) {
+                    System.out.println("URL already exists!");
+                    ctx.sessionAttribute("flash", "Страница уже существует");
+                    ctx.sessionAttribute("flashType", "info");
+                    ctx.redirect("/urls/" + existingUrl.get().getId());
+                } else {
+                    // Yangi
+                    System.out.println("Saving new URL...");
+                    var newUrl = new Url(normalizedUrl);
+                    urlRepository.save(newUrl);
+                    System.out.println("Saved with ID: " + newUrl.getId());
+                    ctx.sessionAttribute("flash", "Страница успешно добавлена");
+                    ctx.sessionAttribute("flashType", "success");
+                    ctx.redirect("/urls/" + newUrl.getId());
+                }
+
+            } catch (Exception e) {
+                System.out.println("Error: " + e.getMessage());  // ← LOG
+                e.printStackTrace();  // ← FULL ERROR
+                ctx.status(422);
+                ctx.sessionAttribute("flash", "Некорректный URL");
+                ctx.sessionAttribute("flashType", "danger");
+                ctx.render("index.jte", Collections.singletonMap("ctx", ctx));
+            }
+        });
+
+        app.get("/urls", ctx -> {
+            var urls = urlRepository.findAll();
+            System.out.println("Found URLs: " + urls.size());  // ← LOG
+            for (var url : urls) {
+                System.out.println("  - " + url.getId() + ": " + url.getName());  // ← LOG
+            }
+            var page = new UrlsPage(urls);
+            var model = new HashMap<String, Object>();
+            model.put("page", page);
+            model.put("ctx", ctx);
+            ctx.render("urls/index.jte", model);
+        });
+
+
+        app.get("/urls/{id}", ctx -> {
+            Long id = ctx.pathParamAsClass("id", Long.class).get();
+            var url = urlRepository.find(id);
+
+            if (url.isPresent()) {
+                var page = new UrlPage(url.get());
+                var model = new HashMap<String, Object>();
+                model.put("page", page);
+                model.put("ctx", ctx);
+                ctx.render("urls/show.jte", model);
+            } else {
+                ctx.status(404);
+                ctx.result("URL not found");
+            }
+        });
+
         return app;
     }
 
@@ -68,5 +159,12 @@ public class App {
              var statement = connection.createStatement()) {
             statement.execute(sql);
         }
+    }
+
+    private static TemplateEngine createTemplateEngine() {
+        ClassLoader classLoader = App.class.getClassLoader();
+        ResourceCodeResolver codeResolver = new ResourceCodeResolver("templates", classLoader);
+        TemplateEngine templateEngine = TemplateEngine.create(codeResolver, ContentType.Html);
+        return templateEngine;
     }
 }

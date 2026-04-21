@@ -4,7 +4,7 @@ plugins {
     checkstyle
     id("org.sonarqube") version "7.1.0.6387"
     id("com.github.ben-manes.versions") version "0.51.0"
-    id("com.github.johnrengelman.shadow") version "8.1.1"
+    // id("com.github.johnrengelman.shadow") version "8.1.1"
 }
 
 repositories {
@@ -47,7 +47,6 @@ dependencies {
     implementation("com.fasterxml.jackson.core:jackson-databind:2.18.3")
     implementation("org.apache.commons:commons-text:1.13.1")
     implementation("gg.jte:jte:3.2.0")
-    implementation("org.projectlombok:lombok:0.11.0")
     implementation("org.slf4j:slf4j-api:2.0.9")
     implementation("ch.qos.logback:logback-classic:1.4.11")
     implementation("io.javalin:javalin:6.6.0")
