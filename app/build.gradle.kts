@@ -43,6 +43,12 @@ dependencies {
     implementation("com.h2database:h2:2.3.232")
     implementation("com.zaxxer:HikariCP:6.3.0")
     implementation("org.postgresql:postgresql:42.1.4")
+    // Lombook
+    compileOnly("org.projectlombok:lombok:1.18.46")
+    annotationProcessor("org.projectlombok:lombok:1.18.46")
+
+    testCompileOnly("org.projectlombok:lombok:1.18.46")
+    testAnnotationProcessor("org.projectlombok:lombok:1.18.46")
     //Jackson
     implementation("com.fasterxml.jackson.core:jackson-databind:2.18.3")
     implementation("org.apache.commons:commons-text:1.13.1")
@@ -53,10 +59,15 @@ dependencies {
     implementation("io.javalin:javalin-bundle:6.6.0")
     implementation("io.javalin:javalin-rendering:6.6.0")
 
+    // HTTP client va HTML parsing
+    implementation("com.konghq:unirest-java:3.14.5")
+    implementation("org.jsoup:jsoup:1.17.2")
+
     testImplementation("org.assertj:assertj-core:3.27.3")
     testImplementation(platform("org.junit:junit-bom:5.12.2"))
     testImplementation("org.junit.jupiter:junit-jupiter")
     testRuntimeOnly("org.junit.platform:junit-platform-launcher")
+    testImplementation("com.squareup.okhttp3:mockwebserver:4.12.0")
 }
 
 tasks.test {

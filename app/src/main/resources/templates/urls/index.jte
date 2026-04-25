@@ -1,5 +1,5 @@
 @import hexlet.code.dto.UrlsPage
-@import hexlet.code.model.Url
+@import hexlet.code.dto.UrlWithLastCheck
 @import java.text.SimpleDateFormat
 @import io.javalin.http.Context
 
@@ -31,18 +31,22 @@ content = @`
         </tr>
         </thead>
         <tbody>
-        @for(Url url : page.getUrls())
+        @for(UrlWithLastCheck urlWithCheck : page.getUrls())
             <tr>
-                <td>${url.getId()}</td>
+                <td>${urlWithCheck.getUrl().getId()}</td>
                 <td>
-                    <a href="/urls/${url.getId()}">${url.getName()}</a>
+                    <a href="/urls/${urlWithCheck.getUrl().getId()}">${urlWithCheck.getUrl().getName()}</a>
                 </td>
                 <td>
-                    @if(url.getCreatedAt() != null)
-                        ${new SimpleDateFormat("dd.MM.yyyy HH:mm").format(url.getCreatedAt())}
+                    @if(urlWithCheck.getLastCheck() != null && urlWithCheck.getLastCheck().getCreatedAt() != null)
+                        ${new SimpleDateFormat("dd.MM.yyyy HH:mm").format(urlWithCheck.getLastCheck().getCreatedAt())}
                     @endif
                 </td>
-                <td></td>
+                <td>
+                    @if(urlWithCheck.getLastCheck() != null)
+                        ${urlWithCheck.getLastCheck().getStatusCode()}
+                    @endif
+                </td>
             </tr>
         @endfor
         </tbody>

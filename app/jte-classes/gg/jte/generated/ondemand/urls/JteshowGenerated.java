@@ -5,7 +5,7 @@ import io.javalin.http.Context;
 @SuppressWarnings("unchecked")
 public final class JteshowGenerated {
 	public static final String JTE_NAME = "urls/show.jte";
-	public static final int[] JTE_LINE_INFO = {0,0,1,2,4,4,4,4,7,7,9,9,10,10,11,11,12,12,13,13,13,13,14,14,14,17,17,18,18,19,19,21,21,21,27,27,27,31,31,31,36,36,37,37,37,38,38,45,45,45,45,48,48,48,48,48,4,5,5,5,5};
+	public static final int[] JTE_LINE_INFO = {0,0,1,2,4,4,4,4,7,7,9,9,10,10,11,11,12,12,13,13,13,13,14,14,14,17,17,18,18,19,19,21,21,21,27,27,27,31,31,31,36,36,37,37,37,38,38,45,45,45,45,61,61,63,63,63,64,64,64,65,65,65,66,66,66,67,67,67,69,69,70,70,70,71,71,74,74,77,77,77,77,77,4,5,5,5,5};
 	public static void render(gg.jte.html.HtmlTemplateOutput jteOutput, gg.jte.html.HtmlInterceptor jteHtmlInterceptor, UrlPage page, Context ctx) {
 		jteOutput.writeContent("\n");
 		gg.jte.generated.ondemand.layout.JtepageGenerated.render(jteOutput, jteHtmlInterceptor, new gg.jte.html.HtmlContent() {
@@ -49,7 +49,33 @@ public final class JteshowGenerated {
 				jteOutput.setContext("form", "action");
 				jteOutput.writeUserContent(page.getUrl().getId());
 				jteOutput.setContext("form", null);
-				jteOutput.writeContent("/checks\" method=\"post\">\n        <button type=\"submit\" class=\"btn btn-primary\">Запустить проверку</button>\n    </form>\n");
+				jteOutput.writeContent("/checks\" method=\"post\">\n        <button type=\"submit\" class=\"btn btn-primary\">Запустить проверку</button>\n    </form>\n\n    <table class=\"table table-bordered table-hover mt-3\" data-test=\"checks\">\n        <thead>\n        <tr>\n            <th>ID</th>\n            <th>Код ответа</th>\n            <th>title</th>\n            <th>h1</th>\n            <th>description</th>\n            <th>Дата проверки</th>\n        </tr>\n        </thead>\n        <tbody>\n        ");
+				for (var check : page.getUrlChecks()) {
+					jteOutput.writeContent("\n            <tr>\n                <td>");
+					jteOutput.setContext("td", null);
+					jteOutput.writeUserContent(check.getId());
+					jteOutput.writeContent("</td>\n                <td>");
+					jteOutput.setContext("td", null);
+					jteOutput.writeUserContent(check.getStatusCode());
+					jteOutput.writeContent("</td>\n                <td>");
+					jteOutput.setContext("td", null);
+					jteOutput.writeUserContent(check.getTitle());
+					jteOutput.writeContent("</td>\n                <td>");
+					jteOutput.setContext("td", null);
+					jteOutput.writeUserContent(check.getH1());
+					jteOutput.writeContent("</td>\n                <td>");
+					jteOutput.setContext("td", null);
+					jteOutput.writeUserContent(check.getDescription());
+					jteOutput.writeContent("</td>\n                <td>\n                    ");
+					if (check.getCreatedAt() != null) {
+						jteOutput.writeContent("\n                        ");
+						jteOutput.setContext("td", null);
+						jteOutput.writeUserContent(new SimpleDateFormat("dd.MM.yyyy HH:mm").format(check.getCreatedAt()));
+						jteOutput.writeContent("\n                    ");
+					}
+					jteOutput.writeContent("\n                </td>\n            </tr>\n        ");
+				}
+				jteOutput.writeContent("\n        </tbody>\n    </table>\n");
 			}
 		}, null);
 	}

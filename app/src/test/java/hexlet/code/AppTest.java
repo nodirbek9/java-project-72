@@ -2,6 +2,10 @@ package hexlet.code;
 
 import io.javalin.Javalin;
 import io.javalin.testtools.JavalinTest;
+import okhttp3.mockwebserver.MockResponse;
+import okhttp3.mockwebserver.MockWebServer;
+import org.junit.jupiter.api.AfterAll;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
@@ -9,6 +13,18 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 class AppTest {
     private Javalin app;
+    private static MockWebServer mockServer;
+
+    @BeforeAll
+    static void beforeAll() throws Exception {
+        mockServer = new MockWebServer();
+        mockServer.start();
+    }
+
+    @AfterAll
+    static void afterAll() throws Exception {
+        mockServer.shutdown();
+    }
 
     @BeforeEach
     void setUp() {
@@ -86,6 +102,80 @@ class AppTest {
         JavalinTest.test(app, (server, client) -> {
             var response = client.get("/urls/999999");
             assertThat(response.code()).isEqualTo(404);
+        });
+    }
+
+    @Test
+    void testCheckUrl() throws Exception {
+        String html = "<html><head><title>Test Title</title>"
+                + "<meta name=\"description\" content=\"Test Description\"></head>"
+                + "<body><h1>Test H1</h1></body></html>";
+
+        mockServer.enqueue(new MockResponse()
+                .setBody(html)
+                .setResponseCode(200));
+
+        String mockUrl = mockServer.url("/").toString();
+
+        JavalinTest.test(app, (server, client) -> {
+            client.post("/urls", "url=" + mockUrl);
+
+            var checkResponse = client.post("/urls/1/checks");
+            assertThat(checkResponse.code()).isEqualTo(200);
+
+            var showResponse = client.get("/urls/1");
+            assertThat(showResponse.code()).isEqualTo(200);
+            var body = showResponse.body().string();
+            assertThat(body).contains("Test Title");
+            assertThat(body).contains("Test H1");
+            assertThat(body).contains("Test Description");
+            assertThat(body).contains("200");
+        });
+    }
+
+    @Test
+    void testCheckUrlWithError() throws Exception {
+        mockServer.enqueue(new MockResponse()
+                .setResponseCode(404));
+
+        String mockUrl = mockServer.url("/").toString();
+
+        JavalinTest.test(app, (server, client) -> {
+            client.post("/urls", "url=" + mockUrl);
+
+            var checkResponse = client.post("/urls/1/checks");
+            assertThat(checkResponse.code()).isEqualTo(200);
+
+            var showResponse = client.get("/urls/1");
+            assertThat(showResponse.code()).isEqualTo(200);
+            var body = showResponse.body().string();
+            assertThat(body).contains("404");
+        });
+    }
+
+    @Test
+    void testCheckUrlWithLongContent() throws Exception {
+        String longTitle = "A".repeat(250);
+        String longH1 = "B".repeat(250);
+        String longDescription = "C".repeat(250);
+
+        String html = "<html><head><title>" + longTitle + "</title>"
+                + "<meta name=\"description\" content=\"" + longDescription + "\"></head>"
+                + "<body><h1>" + longH1 + "</h1></body></html>";
+
+        mockServer.enqueue(new MockResponse()
+                .setBody(html)
+                .setResponseCode(200));
+
+        String mockUrl = mockServer.url("/").toString();
+
+        JavalinTest.test(app, (server, client) -> {
+            client.post("/urls", "url=" + mockUrl);
+            client.post("/urls/1/checks");
+
+            var showResponse = client.get("/urls/1");
+            var body = showResponse.body().string();
+            assertThat(body).contains("...");
         });
     }
 }

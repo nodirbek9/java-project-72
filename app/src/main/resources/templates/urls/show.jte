@@ -45,5 +45,34 @@ content = @`
     <form action="/urls/${page.getUrl().getId()}/checks" method="post">
         <button type="submit" class="btn btn-primary">Запустить проверку</button>
     </form>
+
+    <table class="table table-bordered table-hover mt-3" data-test="checks">
+        <thead>
+        <tr>
+            <th>ID</th>
+            <th>Код ответа</th>
+            <th>title</th>
+            <th>h1</th>
+            <th>description</th>
+            <th>Дата проверки</th>
+        </tr>
+        </thead>
+        <tbody>
+        @for(var check : page.getUrlChecks())
+            <tr>
+                <td>${check.getId()}</td>
+                <td>${check.getStatusCode()}</td>
+                <td>${check.getTitle()}</td>
+                <td>${check.getH1()}</td>
+                <td>${check.getDescription()}</td>
+                <td>
+                    @if(check.getCreatedAt() != null)
+                        ${new SimpleDateFormat("dd.MM.yyyy HH:mm").format(check.getCreatedAt())}
+                    @endif
+                </td>
+            </tr>
+        @endfor
+        </tbody>
+    </table>
 `
 )

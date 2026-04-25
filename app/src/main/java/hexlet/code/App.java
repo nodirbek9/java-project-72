@@ -2,17 +2,23 @@ package hexlet.code;
 
 import hexlet.code.dto.UrlPage;
 import hexlet.code.dto.UrlsPage;
+import hexlet.code.dto.UrlWithLastCheck;
 import hexlet.code.model.Url;
+import hexlet.code.model.UrlCheck;
 import hexlet.code.repository.UrlRepository;
+import hexlet.code.repository.UrlCheckRepository;
 import io.javalin.Javalin;
 import com.zaxxer.hikari.HikariConfig;
 import com.zaxxer.hikari.HikariDataSource;
+import kong.unirest.Unirest;
+import org.jsoup.Jsoup;
 
 import javax.sql.DataSource;
 import java.io.BufferedReader;
 import java.io.InputStreamReader;
 import java.net.URI;
 import java.sql.SQLException;
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.stream.Collectors;
@@ -36,6 +42,7 @@ public class App {
             throw new RuntimeException("Failed to run migrations", e);
         }
         var urlRepository = new UrlRepository(dataSource);
+        var urlCheckRepository = new UrlCheckRepository(dataSource);
 
         var app = Javalin.create(config -> {
             config.bundledPlugins.enableDevLogging();
@@ -93,11 +100,14 @@ public class App {
 
         app.get("/urls", ctx -> {
             var urls = urlRepository.findAll();
-            System.out.println("Found URLs: " + urls.size());  // ← LOG
+            var urlsWithChecks = new ArrayList<UrlWithLastCheck>();
+
             for (var url : urls) {
-                System.out.println("  - " + url.getId() + ": " + url.getName());  // ← LOG
+                var lastCheck = urlCheckRepository.findLastCheckByUrlId(url.getId());
+                urlsWithChecks.add(new UrlWithLastCheck(url, lastCheck));
             }
-            var page = new UrlsPage(urls);
+
+            var page = new UrlsPage(urlsWithChecks);
             var model = new HashMap<String, Object>();
             model.put("page", page);
             model.put("ctx", ctx);
@@ -110,7 +120,8 @@ public class App {
             var url = urlRepository.find(id);
 
             if (url.isPresent()) {
-                var page = new UrlPage(url.get());
+                var checks = urlCheckRepository.findByUrlId(id);
+                var page = new UrlPage(url.get(), checks);
                 var model = new HashMap<String, Object>();
                 model.put("page", page);
                 model.put("ctx", ctx);
@@ -119,6 +130,52 @@ public class App {
                 ctx.status(404);
                 ctx.result("URL not found");
             }
+        });
+
+        app.post("/urls/{id}/checks", ctx -> {
+            Long id = ctx.pathParamAsClass("id", Long.class).get();
+            var url = urlRepository.find(id);
+
+            if (url.isEmpty()) {
+                ctx.status(404);
+                ctx.result("URL not found");
+                return;
+            }
+
+            try {
+                var response = Unirest.get(url.get().getName()).asString();
+                var statusCode = response.getStatus();
+                var body = response.getBody();
+
+                var doc = Jsoup.parse(body);
+                var title = doc.title();
+                var h1Element = doc.selectFirst("h1");
+                var h1 = h1Element != null ? h1Element.text() : "";
+                var descriptionElement = doc.selectFirst("meta[name=description]");
+                var description = descriptionElement != null ? descriptionElement.attr("content") : "";
+
+                // Truncate to 200 characters
+                if (title.length() > 200) {
+                    title = title.substring(0, 200) + "...";
+                }
+                if (h1.length() > 200) {
+                    h1 = h1.substring(0, 200) + "...";
+                }
+                if (description.length() > 200) {
+                    description = description.substring(0, 200) + "...";
+                }
+
+                var urlCheck = new UrlCheck(statusCode, title, h1, description, id);
+                urlCheckRepository.save(urlCheck);
+
+                ctx.sessionAttribute("flash", "Страница успешно проверена");
+                ctx.sessionAttribute("flashType", "success");
+            } catch (Exception e) {
+                ctx.sessionAttribute("flash", "Произошла ошибка при проверке");
+                ctx.sessionAttribute("flashType", "danger");
+            }
+
+            ctx.redirect("/urls/" + id);
         });
 
         return app;
