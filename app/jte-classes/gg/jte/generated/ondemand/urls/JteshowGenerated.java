@@ -49,7 +49,7 @@ public final class JteshowGenerated {
 				jteOutput.setContext("form", "action");
 				jteOutput.writeUserContent(page.getUrl().getId());
 				jteOutput.setContext("form", null);
-				jteOutput.writeContent("/checks\" method=\"post\">\n        <button type=\"submit\" class=\"btn btn-primary\">Запустить проверку</button>\n    </form>\n\n    <table class=\"table table-bordered table-hover mt-3\" data-test=\"checks\">\n        <thead>\n        <tr>\n            <th>ID</th>\n            <th>Код ответа</th>\n            <th>title</th>\n            <th>h1</th>\n            <th>description</th>\n            <th>Дата проверки</th>\n        </tr>\n        </thead>\n        <tbody>\n        ");
+				jteOutput.writeContent("/checks\" method=\"post\">\n        <button type=\"submit\" class=\"btn btn-primary\">Запустить проверку</button>\n    </form>\n\n    <table class=\"table table-bordered table-hover mt-3\" data-test=\"checks\">\n        <thead>\n        <tr>\n            <th>ID</th>\n            <th>Код ответа</th>\n            <th>h1</th>\n            <th>title</th>\n            <th>description</th>\n            <th>Дата проверки</th>\n        </tr>\n        </thead>\n        <tbody>\n        ");
 				for (var check : page.getUrlChecks()) {
 					jteOutput.writeContent("\n            <tr>\n                <td>");
 					jteOutput.setContext("td", null);
@@ -59,10 +59,10 @@ public final class JteshowGenerated {
 					jteOutput.writeUserContent(check.getStatusCode());
 					jteOutput.writeContent("</td>\n                <td>");
 					jteOutput.setContext("td", null);
-					jteOutput.writeUserContent(check.getTitle());
+					jteOutput.writeUserContent(check.getH1());
 					jteOutput.writeContent("</td>\n                <td>");
 					jteOutput.setContext("td", null);
-					jteOutput.writeUserContent(check.getH1());
+					jteOutput.writeUserContent(check.getTitle());
 					jteOutput.writeContent("</td>\n                <td>");
 					jteOutput.setContext("td", null);
 					jteOutput.writeUserContent(check.getDescription());
