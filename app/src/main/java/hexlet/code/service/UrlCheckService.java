@@ -19,6 +19,12 @@ public class UrlCheckService {
     public UrlCheck performCheck(String url, Long urlId) throws Exception {
         var response = Unirest.get(url).asString();
         var statusCode = response.getStatus();
+
+        // Throw exception for 4xx and 5xx status codes
+        if (statusCode >= 400) {
+            throw new Exception("HTTP error: " + statusCode);
+        }
+
         var body = response.getBody();
 
         var parsed = HtmlParser.parse(body);

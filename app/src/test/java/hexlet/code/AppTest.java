@@ -149,7 +149,9 @@ class AppTest {
             var showResponse = client.get("/urls/1");
             assertThat(showResponse.code()).isEqualTo(200);
             var body = showResponse.body().string();
-            assertThat(body).contains("404");
+            // Check table should be empty (no checks created for errors)
+            assertThat(body).contains("Проверки");
+            assertThat(body).doesNotContain("<td>404</td>");
         });
     }
 
