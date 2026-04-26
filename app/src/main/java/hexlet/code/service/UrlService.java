@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.List;
 import java.util.Optional;
 
-public class UrlService {
+public final class UrlService {
 
     private final UrlRepository urlRepository;
 

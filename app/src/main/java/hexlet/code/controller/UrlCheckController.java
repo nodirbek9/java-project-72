@@ -4,7 +4,7 @@ import hexlet.code.service.UrlCheckService;
 import hexlet.code.service.UrlService;
 import io.javalin.http.Context;
 
-public class UrlCheckController {
+public final class UrlCheckController {
 
     private final UrlService urlService;
     private final UrlCheckService urlCheckService;

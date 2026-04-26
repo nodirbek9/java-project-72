@@ -5,7 +5,7 @@ import hexlet.code.model.UrlCheck;
 
 import java.util.List;
 
-public class UrlPage {
+public final class UrlPage {
     private Url url;
     private List<UrlCheck> urlChecks;
 

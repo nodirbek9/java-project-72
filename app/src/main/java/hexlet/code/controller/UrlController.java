@@ -11,7 +11,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
 
-public class UrlController {
+public final class UrlController {
 
     private final UrlService urlService;
     private final UrlCheckService urlCheckService;

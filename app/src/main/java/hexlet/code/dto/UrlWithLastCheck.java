@@ -3,7 +3,7 @@ package hexlet.code.dto;
 import hexlet.code.model.Url;
 import hexlet.code.model.UrlCheck;
 
-public class UrlWithLastCheck {
+public final class UrlWithLastCheck {
     private Url url;
     private UrlCheck lastCheck;
 

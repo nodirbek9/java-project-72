@@ -1,7 +1,7 @@
 package hexlet.code.dto;
 import java.util.List;
 
-public class UrlsPage {
+public final class UrlsPage {
     private List<UrlWithLastCheck> urls;
 
     public UrlsPage(List<UrlWithLastCheck> urls) {

@@ -8,7 +8,7 @@ import kong.unirest.Unirest;
 import java.sql.SQLException;
 import java.util.List;
 
-public class UrlCheckService {
+public final class UrlCheckService {
 
     private final UrlCheckRepository urlCheckRepository;
 
