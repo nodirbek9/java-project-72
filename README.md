@@ -168,7 +168,7 @@ gradle checkstyleMain checkstyleTest
 ## 🎯 Usage Examples
 
 ### 1. Add URL
-![Add URL](java-project-72/app/src/main/resources/screenshots/photo_2026-04-26 14.24.01.jpeg)
+![Add URL](app/src/main/resources/screenshots/add-url.png)
 
 ### 2. URLs List
 ![URLs List](app/src/main/resources/screenshots/urls-list.png)
