@@ -9,7 +9,7 @@ public class BaseRepository {
         this.dataSource = dataSource;
     }
 
-    public DataSource getDataSource() {
+    public final DataSource getDataSource() {
         return dataSource;
     }
 }
