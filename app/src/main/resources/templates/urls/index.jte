@@ -1,6 +1,6 @@
 @import hexlet.code.dto.UrlsPage
 @import hexlet.code.dto.UrlWithLastCheck
-@import java.text.SimpleDateFormat
+@import java.time.format.DateTimeFormatter
 @import io.javalin.http.Context
 
 @param UrlsPage page
@@ -39,7 +39,7 @@ content = @`
                 </td>
                 <td>
                     @if(urlWithCheck.getLastCheck() != null && urlWithCheck.getLastCheck().getCreatedAt() != null)
-                        ${new SimpleDateFormat("dd.MM.yyyy HH:mm").format(urlWithCheck.getLastCheck().getCreatedAt())}
+                        ${urlWithCheck.getLastCheck().getCreatedAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"))}
                     @endif
                 </td>
                 <td>

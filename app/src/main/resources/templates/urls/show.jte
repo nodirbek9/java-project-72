@@ -1,5 +1,5 @@
 @import hexlet.code.dto.UrlPage
-@import java.text.SimpleDateFormat
+@import java.time.format.DateTimeFormatter
 @import io.javalin.http.Context
 
 @param UrlPage page
@@ -34,7 +34,7 @@ content = @`
             <td>Дата создания</td>
             <td>
                 @if(page.getUrl().getCreatedAt() != null)
-                    ${new SimpleDateFormat("dd.MM.yyyy HH:mm").format(page.getUrl().getCreatedAt())}
+                    ${page.getUrl().getCreatedAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"))}
                 @endif
             </td>
         </tr>
@@ -67,7 +67,7 @@ content = @`
                 <td>${check.getDescription()}</td>
                 <td>
                     @if(check.getCreatedAt() != null)
-                        ${new SimpleDateFormat("dd.MM.yyyy HH:mm").format(check.getCreatedAt())}
+                        ${check.getCreatedAt().format(DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm"))}
                     @endif
                 </td>
             </tr>

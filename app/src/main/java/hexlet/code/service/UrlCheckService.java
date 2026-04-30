@@ -7,6 +7,8 @@ import kong.unirest.Unirest;
 
 import java.sql.SQLException;
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 public final class UrlCheckService {
 
@@ -45,7 +47,11 @@ public final class UrlCheckService {
         return urlCheckRepository.findByUrlId(urlId);
     }
 
-    public UrlCheck findLastCheckByUrlId(Long urlId) throws SQLException {
+    public Optional<UrlCheck> findLastCheckByUrlId(Long urlId) throws SQLException {
         return urlCheckRepository.findLastCheckByUrlId(urlId);
+    }
+
+    public Map<Long, UrlCheck> findLatestChecks() throws SQLException {
+        return urlCheckRepository.findLatestChecks();
     }
 }

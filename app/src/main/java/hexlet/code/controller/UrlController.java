@@ -56,10 +56,11 @@ public final class UrlController {
 
     public void list(Context ctx) throws SQLException {
         var urls = urlService.findAll();
+        var latestChecks = urlCheckService.findLatestChecks();
         var urlsWithChecks = new ArrayList<UrlWithLastCheck>();
 
         for (var url : urls) {
-            var lastCheck = urlCheckService.findLastCheckByUrlId(url.getId());
+            var lastCheck = latestChecks.get(url.getId());
             urlsWithChecks.add(new UrlWithLastCheck(url, lastCheck));
         }
 
