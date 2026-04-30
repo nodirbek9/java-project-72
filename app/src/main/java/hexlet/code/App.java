@@ -42,6 +42,22 @@ public class App {
             config.fileRenderer(new JavalinJte(TemplateConfig.createTemplateEngine()));
         });
 
+        // Global exception handlers
+        app.exception(RuntimeException.class, (e, ctx) -> {
+            if (e.getMessage() != null && e.getMessage().contains("not found")) {
+                ctx.status(404);
+                ctx.result(e.getMessage());
+            } else {
+                ctx.status(500);
+                ctx.result("Internal server error: " + e.getMessage());
+            }
+        });
+
+        app.exception(SQLException.class, (e, ctx) -> {
+            ctx.status(500);
+            ctx.result("Database error: " + e.getMessage());
+        });
+
         app.get("/", urlController::index);
         app.post("/urls", urlController::create);
         app.get("/urls", urlController::list);
