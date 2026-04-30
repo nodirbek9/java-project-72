@@ -6,6 +6,7 @@ import javax.sql.DataSource;
 import java.sql.SQLException;
 import java.sql.Statement;
 import java.sql.Timestamp;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
@@ -21,14 +22,15 @@ public final class UrlRepository extends BaseRepository {
         try (var conn = getDataSource().getConnection();
              var stmt = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
 
+            var timestamp = Timestamp.valueOf(LocalDateTime.now());
             stmt.setString(1, url.getName());
-            stmt.setTimestamp(2, new Timestamp(System.currentTimeMillis()));
+            stmt.setTimestamp(2, timestamp);
             stmt.executeUpdate();
 
             var generatedKeys = stmt.getGeneratedKeys();
             if (generatedKeys.next()) {
                 url.setId(generatedKeys.getLong(1));
-                url.setCreatedAt(new Timestamp(System.currentTimeMillis()));
+                url.setCreatedAt(timestamp.toLocalDateTime());
             }
         }
     }
@@ -45,7 +47,7 @@ public final class UrlRepository extends BaseRepository {
             if (rs.next()) {
                 var url = new Url(rs.getString("name"));
                 url.setId(rs.getLong("id"));
-                url.setCreatedAt(rs.getTimestamp("created_at"));
+                url.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                 return Optional.of(url);
             }
 
@@ -65,7 +67,7 @@ public final class UrlRepository extends BaseRepository {
             if (rs.next()) {
                 var url = new Url(rs.getString("name"));
                 url.setId(rs.getLong("id"));
-                url.setCreatedAt(rs.getTimestamp("created_at"));
+                url.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                 return Optional.of(url);
             }
 
@@ -85,7 +87,7 @@ public final class UrlRepository extends BaseRepository {
             while (rs.next()) {
                 var url = new Url(rs.getString("name"));
                 url.setId(rs.getLong("id"));
-                url.setCreatedAt(rs.getTimestamp("created_at"));
+                url.setCreatedAt(rs.getTimestamp("created_at").toLocalDateTime());
                 urls.add(url);
             }
 
