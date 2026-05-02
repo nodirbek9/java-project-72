@@ -35,7 +35,7 @@ public final class UrlRepository extends BaseRepository {
         }
     }
 
-    public Optional<Url> find(Long id) throws SQLException {
+    public static Optional<Url> find(Long id) throws SQLException {
         String sql = "SELECT * FROM urls WHERE id = ?";
 
         try (var conn = getDataSource().getConnection();
