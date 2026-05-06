@@ -9,6 +9,7 @@ import hexlet.code.repository.UrlRepository;
 import hexlet.code.service.UrlCheckService;
 import hexlet.code.service.UrlService;
 import io.javalin.Javalin;
+import io.javalin.http.HttpStatus;
 import io.javalin.rendering.template.JavalinJte;
 
 import java.sql.SQLException;
@@ -45,10 +46,10 @@ public class App {
         // Global exception handlers
         app.exception(RuntimeException.class, (e, ctx) -> {
             if (e.getMessage() != null && e.getMessage().contains("not found")) {
-                ctx.status(404);
+                ctx.status(HttpStatus.NOT_FOUND);
                 ctx.result(e.getMessage());
             } else {
-                ctx.status(500);
+                ctx.status(HttpStatus.INTERNAL_SERVER_ERROR);
                 ctx.result("Internal server error: " + e.getMessage());
             }
         });
